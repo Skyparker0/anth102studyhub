@@ -370,6 +370,38 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: bold; }
   resize: vertical;
 }
 
+.transcript {
+  margin: 1.6rem 0;
+  padding: 0.9rem 1rem;
+  background: var(--surface);
+  border: 2px inset #ffffff;
+}
+.transcript-heading {
+  margin: 0 0 0.3rem;
+  font-size: 1.1rem;
+}
+.beta-tag {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  vertical-align: middle;
+  padding: 0.1rem 0.35rem;
+  margin-left: 0.4rem;
+  border: 1px solid var(--text-muted);
+  color: var(--text-muted);
+}
+.transcript-hint {
+  margin: 0 0 1rem;
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--text-muted);
+}
+.transcript-para {
+  margin: 0 0 0.9rem;
+  line-height: 1.5;
+}
+
 .jump-nav {
   position: fixed;
   top: 90px;
@@ -548,8 +580,14 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: bold; }
 .flashcard-controls {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 0.5rem;
   margin-top: 1.1rem;
+  flex-wrap: wrap;
+}
+.fc-browse-controls {
+  display: flex;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
 .flashcard-controls button {
@@ -563,6 +601,35 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: bold; }
 }
 .flashcard-controls button:active { border-style: inset; }
 #fc-flip { font-weight: bold; }
+
+.fc-review-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 2.5rem 1rem;
+}
+
+.fc-rating-controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+  flex-wrap: wrap;
+}
+.fc-rating-controls button {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: bold;
+  padding: 0.4rem 1rem;
+  border: 2px outset #d4d0c8;
+  background: #d4d0c8;
+  color: #000000;
+  cursor: pointer;
+}
+.fc-rating-controls button:active { border-style: inset; }
+.fc-again { background: #e8b4b4; }
+.fc-good { background: #d4d0c8; }
+.fc-easy { background: #b4e0b4; }
 
 /* ============================================================
    Resources page

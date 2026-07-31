@@ -25,6 +25,12 @@ EXTERNAL_LINKS_TXT = COURSE_ROOT / "ExternalLinks.txt"
 FLASHCARDS_PDF = COURSE_ROOT / "Flashcards.pdf"
 STUDY_GUIDE_DOCX = FILES_DIR / "ANTH 102 - BLANK StudyGuide COPY.docx"
 
+# Written by the separate, occasional site/fetch_transcripts.py pipeline --
+# only whichever lectures have actually been transcribed get a file here, so
+# this is deliberately data-driven (checked per-lecture at build time) rather
+# than a hardcoded list.
+TRANSCRIPT_DIR = COURSE_ROOT / "transcripts"
+
 # The study guide's own "Lecture N" numbering was never updated to match the
 # site's current lecture order (a Macroevolution lecture got inserted as L6,
 # shifting everything after it by one; some numbers were also renamed/split
@@ -321,6 +327,20 @@ def study_guide_by_code(sections):
     return out
 
 
+def load_transcript(code):
+    """Returns {"paragraphs": [...]} if a transcript exists for this lecture code, else None.
+
+    Keyed by lecture code (e.g. "L1", "L9.1") to match the filenames written
+    by fetch_transcripts.py, which uses code.replace(".", "_") as the slug.
+    """
+    txt_path = TRANSCRIPT_DIR / f"{code.replace('.', '_')}.txt"
+    if not txt_path.exists():
+        return None
+    text = txt_path.read_text(encoding="utf-8").strip()
+    paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
+    return {"paragraphs": paragraphs} if paragraphs else None
+
+
 # ---------------------------------------------------------------------------
 # Build
 # ---------------------------------------------------------------------------
@@ -376,6 +396,14 @@ def build():
     else:
         for lec in lectures:
             lec["study_guide"] = None
+
+    transcribed = 0
+    for lec in lectures:
+        lec["transcript"] = load_transcript(lec["code"])
+        if lec["transcript"]:
+            transcribed += 1
+    if transcribed:
+        print(f"Transcripts: {transcribed} lecture(s) have a transcript")
 
     print(f"Lectures generated: {stats['lecture']} | Images: {stats['image']} | "
           f"Slide images rendered: {stats['slide_images']} decks | "
@@ -564,6 +592,18 @@ def write_search_index(lectures, flashcards):
             "kind": "flashcard", "code": "FC", "title": card["q"] or f"Flashcard #{card['num']}",
             "card_num": card["num"], "text": text,
         })
+
+    for lec in lectures:
+        if not lec.get("transcript"):
+            continue
+        for i, para in enumerate(lec["transcript"]["paragraphs"]):
+            text = para.strip()
+            if not text:
+                continue
+            chunks.append({
+                "kind": "transcript", "code": lec["code"], "slug": lec["slug"],
+                "title": lec["title"], "para": i, "text": text,
+            })
 
     js_dir = STATIC_DIR / "js"
     js_dir.mkdir(parents=True, exist_ok=True)

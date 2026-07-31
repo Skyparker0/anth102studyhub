@@ -101,7 +101,17 @@
 </section>
 {% endif %}
 
-{% if lecture.slides or lecture.study_guide %}
+{% if lecture.transcript %}
+<section class="transcript" id="transcript">
+  <h2 class="transcript-heading">Lecture Transcript <span class="beta-tag">BETA</span></h2>
+  <p class="transcript-hint">Auto-transcribed from the professor's recorded lecture. May contain errors -- not a substitute for the slides.</p>
+  {% for para in lecture.transcript.paragraphs %}
+  <p class="transcript-para" id="transcript-p{{ loop.index }}">{{ para }}</p>
+  {% endfor %}
+</section>
+{% endif %}
+
+{% if lecture.slides or lecture.study_guide or lecture.transcript %}
 <nav class="jump-nav" aria-label="Jump to section">
   <a href="#top" class="jump-nav-top">&uarr; Top</a>
   {% if lecture.slides %}
@@ -118,6 +128,14 @@
     <div class="jump-nav-links">
       <a href="#study-guide">Top</a>
       {% for q in lecture.study_guide %}<a href="#sgq-{{ q.num }}">Q{{ q.num }}</a>{% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  {% if lecture.transcript %}
+  <div class="jump-nav-group">
+    <span class="jump-nav-label">Transcript</span>
+    <div class="jump-nav-links">
+      <a href="#transcript">Top</a>
     </div>
   </div>
   {% endif %}

@@ -21,14 +21,26 @@
       </div>
     </div>
   </div>
+
+  <p class="fc-review-empty" id="fc-review-empty" style="display: none;">Nothing due right now &mdash; nice work. Check back later, or switch back to Browse.</p>
+
   <div class="flashcard-controls">
-    <button id="fc-prev" type="button">&larr; Prev</button>
+    <div class="fc-browse-controls" id="fc-browse-controls">
+      <button id="fc-prev" type="button">&larr; Prev</button>
+      <button id="fc-shuffle" type="button">Shuffle</button>
+      <button id="fc-next" type="button">Next &rarr;</button>
+    </div>
     <button id="fc-flip" type="button">Flip</button>
-    <button id="fc-shuffle" type="button">Shuffle</button>
-    <button id="fc-next" type="button">Next &rarr;</button>
+    <button id="fc-review-toggle" type="button">Review</button>
+  </div>
+  <div class="fc-rating-controls" id="fc-rating-controls" style="display: none;">
+    <button id="fc-again" type="button" class="fc-again">Again</button>
+    <button id="fc-good" type="button" class="fc-good">Good</button>
+    <button id="fc-easy" type="button" class="fc-easy">Easy</button>
   </div>
 </div>
 
 <script>const FLASHCARDS = {{ flashcards|tojson }};</script>
+<script src="../static/js/flashcards-review.js"></script>
 <script src="../static/js/flashcards.js"></script>
 {% endblock %}

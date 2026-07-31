@@ -7,6 +7,11 @@
   var activeIndex = -1;
   var currentMatches = [];
 
+  // Transcript paragraphs are numerous, short, and full of generic spoken
+  // phrasing -- without a penalty they drown out slide/flashcard matches on
+  // common words. This keeps them rankable but not dominant.
+  var KIND_WEIGHT = { transcript: 0.4 };
+
   function escapeRegex(s) {
     return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
@@ -32,7 +37,7 @@
     }
 
     if (terms.length > 1 && haystack.indexOf(phrase) !== -1) total += 6;
-    return total;
+    return total * (KIND_WEIGHT[chunk.kind] || 1);
   }
 
   function findAnchorTerm(text, terms) {
@@ -126,6 +131,9 @@
       if (chunk.kind === "flashcard") {
         a.href = prefix + "flashcards/index.html#card-" + chunk.card_num;
         codeSpan.textContent = "Flashcard #" + chunk.card_num;
+      } else if (chunk.kind === "transcript") {
+        a.href = prefix + "lectures/" + chunk.slug + "/index.html#transcript-p" + (chunk.para + 1);
+        codeSpan.textContent = chunk.code + " · Transcript";
       } else {
         a.href = prefix + "lectures/" + chunk.slug + "/index.html#slide-" + chunk.slide;
         codeSpan.textContent = chunk.code + " · Slide " + chunk.slide;

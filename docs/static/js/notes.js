@@ -39,4 +39,31 @@
       }
     }, 400);
   });
+
+  var copyBtn = document.getElementById("notes-copy-btn");
+  if (copyBtn) {
+    copyBtn.addEventListener("click", function () {
+      var restore = copyBtn.textContent;
+      function done(ok) {
+        copyBtn.textContent = ok ? "Copied!" : "Copy failed";
+        setTimeout(function () { copyBtn.textContent = restore; }, 1500);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(textarea.value).then(function () {
+          done(true);
+        }, function () {
+          done(false);
+        });
+      } else {
+        try {
+          textarea.select();
+          document.execCommand("copy");
+          window.getSelection().removeAllRanges();
+          done(true);
+        } catch (e) {
+          done(false);
+        }
+      }
+    });
+  }
 })();

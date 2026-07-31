@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}{{ lecture.code }} {{ lecture.title }} · ANTH 102{% endblock %}
 {% block content %}
-<header class="page-header">
+<header class="page-header" id="top">
   <p class="breadcrumb"><a href="../../index.html">All lectures</a> &rsaquo; {{ lecture.era }}</p>
   <h1><span class="lecture-code-large">{{ lecture.code }}</span> {{ lecture.title }}</h1>
   {% if lecture.quiz %}
@@ -15,7 +15,12 @@
 </header>
 
 <section class="notes-box">
-  <label class="notes-label" for="notes-textarea">My Notes <span class="notes-status" id="notes-status"></span></label>
+  <label class="notes-label" for="notes-textarea">My Notes
+    <span class="notes-label-right">
+      <span class="notes-status" id="notes-status"></span>
+      <button type="button" id="notes-copy-btn" class="notes-copy-btn">Copy</button>
+    </span>
+  </label>
   <textarea id="notes-textarea" data-lecture-slug="{{ lecture.slug }}"
             placeholder="Jot down your own notes for this lecture -- saved automatically in this browser, only on this device."></textarea>
 </section>
@@ -74,5 +79,51 @@
 <p class="empty-note">No extractable text was found in this deck (it may be image-only).</p>
 {% endif %}
 
+{% if lecture.study_guide %}
+<section class="study-guide" data-lecture-slug="{{ lecture.slug }}" id="study-guide">
+  <h2 class="study-guide-heading">Study Guide Questions</h2>
+  <p class="study-guide-hint">From your professor's study guide, matched to this lecture. Answers autosave in this browser as you type.</p>
+  {% for q in lecture.study_guide %}
+  <div class="sg-question" id="sgq-{{ q.num }}">
+    <label class="sg-prompt" for="sg-{{ q.num }}">{{ q.num }}. {{ q.prompt }}</label>
+    {% if q.subfields %}
+    <div class="sg-subfields">
+      {% for sub in q.subfields %}
+      <label class="sg-sub-label" for="sg-{{ q.num }}-{{ loop.index }}">{{ sub }}</label>
+      <input type="text" class="sg-input" id="sg-{{ q.num }}-{{ loop.index }}" data-sg-key="{{ q.num }}.{{ loop.index }}">
+      {% endfor %}
+    </div>
+    {% else %}
+    <textarea class="sg-input sg-textarea" id="sg-{{ q.num }}" data-sg-key="{{ q.num }}"></textarea>
+    {% endif %}
+  </div>
+  {% endfor %}
+</section>
+{% endif %}
+
+{% if lecture.slides or lecture.study_guide %}
+<nav class="jump-nav" aria-label="Jump to section">
+  <a href="#top" class="jump-nav-top">&uarr; Top</a>
+  {% if lecture.slides %}
+  <div class="jump-nav-group">
+    <span class="jump-nav-label">Slides</span>
+    <div class="jump-nav-links">
+      {% for slide in lecture.slides %}<a href="#slide-{{ slide.number }}">S{{ slide.number }}</a>{% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  {% if lecture.study_guide %}
+  <div class="jump-nav-group">
+    <span class="jump-nav-label">Study Q&rsquo;s</span>
+    <div class="jump-nav-links">
+      <a href="#study-guide">Top</a>
+      {% for q in lecture.study_guide %}<a href="#sgq-{{ q.num }}">Q{{ q.num }}</a>{% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</nav>
+{% endif %}
+
 <script src="../../static/js/notes.js"></script>
+{% if lecture.study_guide %}<script src="../../static/js/study-guide.js"></script>{% endif %}
 {% endblock %}

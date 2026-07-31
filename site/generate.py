@@ -23,6 +23,19 @@ FILES_DIR = EXPORT_DIR / "viewer" / "files"
 COURSE_DATA_JS = EXPORT_DIR / "viewer" / "course-data.js"
 EXTERNAL_LINKS_TXT = COURSE_ROOT / "ExternalLinks.txt"
 FLASHCARDS_PDF = COURSE_ROOT / "Flashcards.pdf"
+STUDY_GUIDE_DOCX = FILES_DIR / "ANTH 102 - BLANK StudyGuide COPY.docx"
+
+# The study guide's own "Lecture N" numbering was never updated to match the
+# site's current lecture order (a Macroevolution lecture got inserted as L6,
+# shifting everything after it by one; some numbers were also renamed/split
+# since). Mapped by topic, not number -- verified by hand against both
+# documents. Lectures with no entry here (L6, L15.2, L16.2, L16.3, L17)
+# simply predate/postdate what the guide covers and get no section.
+GUIDE_CODE_MAP = {
+    1: "L1", 2: "L2", 3: "L3", 4: "L4", 5: "L5",
+    6: "L7", 7: "L8", 8: "L9.1", 9: "L10", 10: "L11",
+    11: "L12", 12: "L13", 13: "L14", 14: "L15.1", 15: "L16.1",
+}
 
 TEMPLATES_DIR = SITE_DIR / "templates"
 STATIC_DIR = SITE_DIR / "static"
@@ -254,6 +267,60 @@ def extract_flashcards(path):
     return cards
 
 
+_GUIDE_HEADER_RE = re.compile(r"^lecture\s+(\d+)\s*[:\-]\s*(.*)$", re.I)
+_GUIDE_QNUM_RE = re.compile(r"^(\d+)\.\s*(.*)$")
+
+
+def parse_study_guide(path):
+    """Parse the professor's blank study-guide docx into per-guide-lecture
+    lists of numbered questions. Some questions have unlabeled follow-up
+    lines (e.g. a list of traits to fill in under one prompt) -- those are
+    kept as subfields of the preceding numbered question."""
+    import docx
+
+    doc = docx.Document(str(path))
+    paras = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
+
+    sections = []
+    cur_section = None
+    cur_question = None
+
+    for text in paras:
+        m = _GUIDE_HEADER_RE.match(text)
+        if m:
+            cur_section = {"guide_num": int(m.group(1)), "guide_title": m.group(2).strip(), "questions": []}
+            sections.append(cur_section)
+            cur_question = None
+            continue
+        if cur_section is None:
+            continue  # front-matter before "Lecture 1"
+        m = _GUIDE_QNUM_RE.match(text)
+        if m:
+            cur_question = {"num": int(m.group(1)), "prompt": m.group(2).strip(), "subfields": []}
+            cur_section["questions"].append(cur_question)
+        elif cur_question is not None:
+            cur_question["subfields"].append(text)
+        else:
+            # This section never uses numbering (Lecture 1's guide has none)
+            # -- give every line its own field, numbered per-section instead.
+            cur_section["questions"].append({
+                "num": len(cur_section["questions"]) + 1,
+                "prompt": text.rstrip(":").strip(),
+                "subfields": [],
+            })
+
+    return sections
+
+
+def study_guide_by_code(sections):
+    out = {}
+    for sec in sections:
+        code = GUIDE_CODE_MAP.get(sec["guide_num"])
+        if code:
+            out[code] = sec["questions"]
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Build
 # ---------------------------------------------------------------------------
@@ -299,6 +366,16 @@ def build():
         blank = [c["num"] for c in flashcards if not c["a"]]
         print(f"Flashcards: {len(flashcards)} cards parsed from {FLASHCARDS_PDF.name}"
               + (f" (blank answer in source PDF: {blank})" if blank else ""))
+
+    if STUDY_GUIDE_DOCX.exists():
+        study_guide_map = study_guide_by_code(parse_study_guide(STUDY_GUIDE_DOCX))
+        total_q = sum(len(v) for v in study_guide_map.values())
+        print(f"Study guide: {total_q} questions mapped to {len(study_guide_map)} lectures")
+        for lec in lectures:
+            lec["study_guide"] = study_guide_map.get(lec["code"])
+    else:
+        for lec in lectures:
+            lec["study_guide"] = None
 
     print(f"Lectures generated: {stats['lecture']} | Images: {stats['image']} | "
           f"Slide images rendered: {stats['slide_images']} decks | "
@@ -400,7 +477,17 @@ def _build_modules(modules_raw, used_slugs, lectures, seen_files, stats, unmatch
 
 def render(lectures, external_links, flashcards):
     if OUT_DIR.exists():
-        shutil.rmtree(OUT_DIR)
+        # OneDrive (Desktop is synced) briefly locks files right after a big
+        # batch of writes -- retry the delete instead of failing the build.
+        import time
+        for attempt in range(6):
+            try:
+                shutil.rmtree(OUT_DIR)
+                break
+            except PermissionError:
+                if attempt == 5:
+                    raise
+                time.sleep(2)
     OUT_DIR.mkdir(parents=True)
 
     env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)), autoescape=True)

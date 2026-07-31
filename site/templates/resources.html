@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Resources · ANTH 102{% endblock %}
+{% block content %}
+<header class="page-header">
+  <p class="breadcrumb"><a href="../index.html">All lectures</a></p>
+  <h1>Resources</h1>
+</header>
+
+<ul class="link-list">
+  {% for link in external_links %}
+  <li><a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }}</a></li>
+  {% endfor %}
+</ul>
+{% endblock %}

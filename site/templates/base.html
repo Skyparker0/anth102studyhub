@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>{% block title %}ANTH 102 Study Guide{% endblock %}</title>
+<link rel="stylesheet" href="{{ '../' * depth }}static/css/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <a class="brand" href="{{ '../' * depth }}index.html">
+      <span class="brand-mark">A102</span>
+      <span class="brand-name">Biological Anthropology</span>
+    </a>
+    <div class="search-box">
+      <input type="text" id="site-search" placeholder="Search lectures&hellip;" autocomplete="off">
+      <div id="search-results" class="search-results"></div>
+    </div>
+    <nav>
+      {% set ns = namespace(era=None) %}
+      <ul>
+        {% for l in nav_lectures %}
+          {% if l.era != ns.era %}
+            {% if not loop.first %}</ul><ul>{% endif %}
+            <li class="era-label">{{ l.era }}</li>
+            {% set ns.era = l.era %}
+          {% endif %}
+          <li>
+            <a href="{{ '../' * depth }}lectures/{{ l.slug }}/index.html" class="nav-lecture">
+              <span class="nav-code">{{ l.code }}</span>
+              <span class="nav-title">{{ l.title }}</span>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+      <ul class="sidebar-footer">
+        <li><a href="{{ '../' * depth }}flashcards/index.html">Flashcards</a></li>
+        <li><a href="{{ '../' * depth }}resources/index.html">Resources</a></li>
+      </ul>
+    </nav>
+  </aside>
+  <main class="content">
+    {% block content %}{% endblock %}
+  </main>
+</div>
+<script>window.SITE_DEPTH = {{ depth }};</script>
+<script src="{{ '../' * depth }}static/js/search-data.js"></script>
+<script src="{{ '../' * depth }}static/js/search.js"></script>
+</body>
+</html>

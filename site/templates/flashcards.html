@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Flashcards · ANTH 102{% endblock %}
+{% block content %}
+<header class="page-header">
+  <p class="breadcrumb"><a href="../index.html">All lectures</a></p>
+  <h1>Flashcards</h1>
+  <p class="hero-subtitle">{{ flashcards|length }} cards, pulled from the combined exam study set.</p>
+</header>
+
+<div class="flashcard-app" id="flashcard-app">
+  <div class="flashcard" id="flashcard" tabindex="0">
+    <div class="flashcard-inner">
+      <div class="flashcard-face flashcard-front">
+        <span class="flashcard-meta" id="fc-count"></span>
+        <p id="fc-question"></p>
+        <span class="flashcard-hint">click or press space to flip</span>
+      </div>
+      <div class="flashcard-face flashcard-back">
+        <span class="flashcard-meta">Answer</span>
+        <p id="fc-answer"></p>
+      </div>
+    </div>
+  </div>
+  <div class="flashcard-controls">
+    <button id="fc-prev" type="button">&larr; Prev</button>
+    <button id="fc-flip" type="button">Flip</button>
+    <button id="fc-shuffle" type="button">Shuffle</button>
+    <button id="fc-next" type="button">Next &rarr;</button>
+  </div>
+</div>
+
+<script>const FLASHCARDS = {{ flashcards|tojson }};</script>
+<script src="../static/js/flashcards.js"></script>
+{% endblock %}

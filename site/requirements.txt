@@ -1,0 +1,3 @@
+python-pptx
+pdfplumber==0.11.4
+Jinja2

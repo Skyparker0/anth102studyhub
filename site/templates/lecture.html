@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}{{ lecture.code }} {{ lecture.title }} · ANTH 102{% endblock %}
+{% block content %}
+<header class="page-header">
+  <p class="breadcrumb"><a href="../../index.html">All lectures</a> &rsaquo; {{ lecture.era }}</p>
+  <h1><span class="lecture-code-large">{{ lecture.code }}</span> {{ lecture.title }}</h1>
+  {% if lecture.quiz %}
+  <span class="quiz-badge">
+    &#10067; {{ lecture.quiz.title }}
+    {% if lecture.quiz.question_count %} &middot; {{ lecture.quiz.question_count }} questions{% endif %}
+    {% if lecture.quiz.points %} &middot; {{ lecture.quiz.points|round(0, 'common')|int }} pts{% endif %}
+    <span class="quiz-badge-note">on Canvas</span>
+  </span>
+  {% endif %}
+</header>
+
+<section class="notes-box">
+  <label class="notes-label" for="notes-textarea">My Notes <span class="notes-status" id="notes-status"></span></label>
+  <textarea id="notes-textarea" data-lecture-slug="{{ lecture.slug }}"
+            placeholder="Jot down your own notes for this lecture -- saved automatically in this browser, only on this device."></textarea>
+</section>
+
+{% if lecture.links %}
+<section class="link-strip">
+  {% for link in lecture.links %}
+  <a href="{{ link.href }}" target="_blank" rel="noopener">{{ link.title }}</a>
+  {% endfor %}
+</section>
+{% endif %}
+
+{% if lecture.images %}
+<section class="lecture-images">
+  {% for img in lecture.images %}
+  <figure>
+    <img src="../../static/{{ img.src }}" alt="{{ img.title }}" loading="lazy">
+    <figcaption>{{ img.title }}</figcaption>
+  </figure>
+  {% endfor %}
+</section>
+{% endif %}
+
+{% if lecture.slides %}
+<div class="slide-list">
+  {% for slide in lecture.slides %}
+  <section class="slide" id="slide-{{ slide.number }}">
+    <h2 class="slide-number">Slide {{ slide.number }}</h2>
+    <div class="slide-body">
+      {% if lecture.slide_image_dir %}
+      <img class="slide-image" src="../../static/{{ lecture.slide_image_dir }}/Slide{{ slide.number }}.JPG"
+           alt="Slide {{ slide.number }}" loading="lazy">
+      {% endif %}
+      <div class="slide-text">
+        {% if slide.lines %}
+        <ul class="slide-lines">
+          {% for line in slide.lines %}
+          <li>{{ line }}</li>
+          {% endfor %}
+        </ul>
+        {% elif not lecture.slide_image_dir %}
+        <p class="empty-note">(no text on this slide)</p>
+        {% endif %}
+        {% if slide.notes %}
+        <div class="slide-notes">
+          <strong>Notes:</strong>
+          <p>{{ slide.notes }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+  {% endfor %}
+</div>
+{% else %}
+<p class="empty-note">No extractable text was found in this deck (it may be image-only).</p>
+{% endif %}
+
+<script src="../../static/js/notes.js"></script>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}ANTH 102 Study Guide{% endblock %}
+{% block content %}
+<header class="hero">
+  <p class="hero-eyebrow">A field guide to the course</p>
+  <h1>Biological Anthropology 102</h1>
+  <p class="hero-subtitle">Every lecture, cleaned up and laid out properly &mdash; {{ nav_lectures|length }} lectures across five units, from what makes us human to how we got here.</p>
+</header>
+
+{% set ns = namespace(era=None) %}
+{% for l in nav_lectures %}
+  {% if l.era != ns.era %}
+    {% if not loop.first %}
+      </div>
+    </section>
+    {% endif %}
+    <section class="era-section">
+      <h2 class="era-heading">{{ l.era }}</h2>
+      <div class="lecture-grid">
+    {% set ns.era = l.era %}
+  {% endif %}
+  <a class="lecture-card" href="lectures/{{ l.slug }}/index.html">
+    {% if l.cover %}
+    <img class="lecture-card-cover" src="static/{{ l.cover }}" alt="" loading="lazy">
+    {% endif %}
+    <span class="lecture-card-code">{{ l.code }}</span>
+    <span class="lecture-card-title">{{ l.title }}</span>
+  </a>
+  {% if loop.last %}
+      </div>
+    </section>
+  {% endif %}
+{% endfor %}
+{% endblock %}

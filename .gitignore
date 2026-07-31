@@ -1,0 +1,6 @@
+Course content/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.claude/

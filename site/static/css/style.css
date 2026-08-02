@@ -402,6 +402,19 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: bold; }
   line-height: 1.5;
 }
 
+.audio-resource {
+  margin: 1.8rem 0;
+}
+.audio-resource h2 {
+  margin: 0 0 0.6rem;
+}
+.audio-resource audio {
+  width: 100%;
+  max-width: 420px;
+  display: block;
+  margin-bottom: 0.6rem;
+}
+
 .jump-nav {
   position: fixed;
   top: 90px;

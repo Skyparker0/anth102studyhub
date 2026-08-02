@@ -11,4 +11,18 @@
   <li><a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }}</a></li>
   {% endfor %}
 </ul>
+
+{% for res in audio_resources %}
+<section class="audio-resource">
+  <h2>{{ res.title }}</h2>
+  <audio controls src="../static/{{ res.audio_src }}"></audio>
+  <div class="transcript">
+    <h3 class="transcript-heading">Transcript <span class="beta-tag">BETA</span></h3>
+    <p class="transcript-hint">Auto-transcribed. May contain errors.</p>
+    {% for para in res.paragraphs %}
+    <p class="transcript-para">{{ para }}</p>
+    {% endfor %}
+  </div>
+</section>
+{% endfor %}
 {% endblock %}

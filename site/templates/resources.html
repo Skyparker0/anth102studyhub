@@ -18,7 +18,7 @@
   <audio controls src="../static/{{ res.audio_src }}"></audio>
   <div class="transcript">
     <h3 class="transcript-heading">Transcript <span class="beta-tag">BETA</span></h3>
-    <p class="transcript-hint">Auto-transcribed. May contain errors.</p>
+    <p class="transcript-hint">Auto-transcribed using OpenAI's Whisper. May contain errors.</p>
     {% for para in res.paragraphs %}
     <p class="transcript-para">{{ para }}</p>
     {% endfor %}

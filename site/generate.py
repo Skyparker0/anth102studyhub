@@ -31,6 +31,19 @@ STUDY_GUIDE_DOCX = FILES_DIR / "ANTH 102 - BLANK StudyGuide COPY.docx"
 # than a hardcoded list.
 TRANSCRIPT_DIR = COURSE_ROOT / "transcripts"
 
+# Standalone audio resources (not tied to a specific lecture) shown on the
+# Resources page, each with its own transcript. Unlike lecture audio, these
+# mp3s are small enough to live as committed assets under site/static rather
+# than the gitignored Course content/ tree, so the site is self-contained.
+DATA_DIR = SITE_DIR / "data"
+AUDIO_RESOURCES = [
+    {
+        "title": "Five Forces of Evolution (song)",
+        "audio_src": "audio/five-forces-of-evolution.mp3",
+        "transcript_path": DATA_DIR / "five-forces-transcript.txt",
+    },
+]
+
 # The study guide's own "Lecture N" numbering was never updated to match the
 # site's current lecture order (a Macroevolution lecture got inserted as L6,
 # shifting everything after it by one; some numbers were also renamed/split
@@ -341,6 +354,26 @@ def load_transcript(code):
     return {"paragraphs": paragraphs} if paragraphs else None
 
 
+def load_audio_resources():
+    """Returns AUDIO_RESOURCES entries whose transcript file exists, with
+    paragraphs loaded in."""
+    out = []
+    for res in AUDIO_RESOURCES:
+        path = res["transcript_path"]
+        if not path.exists():
+            continue
+        text = path.read_text(encoding="utf-8").strip()
+        paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
+        if not paragraphs:
+            continue
+        out.append({
+            "title": res["title"],
+            "audio_src": res["audio_src"],
+            "paragraphs": paragraphs,
+        })
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Build
 # ---------------------------------------------------------------------------
@@ -379,6 +412,7 @@ def build():
             ppt_app.Quit()
 
     external_links = parse_external_links()
+    audio_resources = load_audio_resources()
 
     flashcards = []
     if FLASHCARDS_PDF.exists():
@@ -411,7 +445,7 @@ def build():
     if unmatched_pptx:
         print(f"WARNING: pptx referenced but file not found, skipped: {unmatched_pptx}")
 
-    render(lectures, external_links, flashcards)
+    render(lectures, external_links, flashcards, audio_resources)
 
 
 def _build_modules(modules_raw, used_slugs, lectures, seen_files, stats, unmatched_pptx, ppt_app):
@@ -503,7 +537,7 @@ def _build_modules(modules_raw, used_slugs, lectures, seen_files, stats, unmatch
             stats["quiz_only"] += 1
 
 
-def render(lectures, external_links, flashcards):
+def render(lectures, external_links, flashcards, audio_resources=None):
     if OUT_DIR.exists():
         # OneDrive (Desktop is synced) briefly locks files right after a big
         # batch of writes -- retry the delete instead of failing the build.
@@ -544,7 +578,8 @@ def render(lectures, external_links, flashcards):
         written_slugs.add(lec["slug"])
         write(f"lectures/{lec['slug']}/index.html", "lecture.html", lecture=lec)
 
-    write("resources/index.html", "resources.html", external_links=external_links)
+    write("resources/index.html", "resources.html", external_links=external_links,
+          audio_resources=audio_resources or [])
 
     if flashcards:
         write("flashcards/index.html", "flashcards.html", flashcards=flashcards)

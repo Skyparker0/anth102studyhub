@@ -2,9 +2,8 @@
 {% block title %}ANTH 102 Study Guide{% endblock %}
 {% block content %}
 <header class="hero">
-  <p class="hero-eyebrow">A field guide to the course</p>
   <h1>Biological Anthropology 102</h1>
-  <p class="hero-subtitle">Every lecture, cleaned up and laid out properly &mdash; {{ nav_lectures|length }} lectures across five units, from what makes us human to how we got here.</p>
+  <p class="hero-subtitle">{{ nav_lectures|length }} lectures.</p>
 </header>
 
 {% set ns = namespace(era=None) %}

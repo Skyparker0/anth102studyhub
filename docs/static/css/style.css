@@ -208,12 +208,6 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: bold; }
    Homepage hero + era list
    ============================================================ */
 .hero { margin-bottom: 1.5rem; max-width: 62ch; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
-.hero-eyebrow {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  font-weight: normal;
-  margin: 0 0 0.3rem;
-}
 .hero h1 {
   margin: 0 0 0.6rem;
   font-size: 2rem;

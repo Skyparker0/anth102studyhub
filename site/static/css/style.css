@@ -214,6 +214,24 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: bold; }
   line-height: 1.2;
 }
 .hero-subtitle { color: #000000; font-size: 1rem; }
+.hero-quote {
+  margin: 1rem 0 0;
+  padding-left: 1rem;
+  border-left: 3px solid var(--border);
+}
+.hero-quote p {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.hero-quote cite {
+  font-size: 0.8rem;
+  font-style: normal;
+  color: var(--text-muted);
+}
+.hero-quote cite a { color: inherit; }
 
 .era-section { margin-bottom: 1.6rem; }
 .era-heading {

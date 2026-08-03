@@ -82,7 +82,7 @@
 {% if lecture.study_guide %}
 <section class="study-guide" data-lecture-slug="{{ lecture.slug }}" id="study-guide">
   <h2 class="study-guide-heading">Study Guide Questions</h2>
-  <p class="study-guide-hint">From your professor's study guide, matched to this lecture. Answers autosave in this browser as you type.</p>
+  <p class="study-guide-hint">From the study guide. Answers autosave in this browser.</p>
   {% for q in lecture.study_guide %}
   <div class="sg-question" id="sgq-{{ q.num }}">
     <label class="sg-prompt" for="sg-{{ q.num }}">{{ q.num }}. {{ q.prompt }}</label>
